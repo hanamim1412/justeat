@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}View Order Items {% endblock %}
+{% block content %}
+<div class="container py-5">
+    
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+    </script>
+    <div class="row justify-content-center my-4 pt-5">
+
+        <div class="col-md-10 d-flex flex-column">
+      
+            {% if messages %}
+            {% for message in messages %}
+            <div id="msg" class="alert {{ message.tags }} text-center" role="alert" style="width: 50%; margin: auto;">
+                {{ message }}
+            </div>
+            <script>
+                setTimeout(function() {
+                    var msgElement = document.getElementById('msg');
+                    if (msgElement !== null) {
+                        msgElement.parentNode.removeChild(msgElement);
+                    }
+                }, 3000);
+            </script>
+            {% endfor %}
+            {% endif %}
+            
+            {% if restaurant_order_items %}
+                <button onclick="goBack()" class="btn btn-primary mb-3" style="width:200px;">Back</button>
+                {% for restaurant, order_items in restaurant_order_items.items %}
+                    {% if order_items %}
+                        <div class="card mb-4">
+                            <div class="card-header py-3">
+                                <h5 class="mb-0">Note that your order cannot be accepted without placing an order and proceeding to payment</h5>
+                            </div>
+                            <div class="card-header py-3">
+                                <h5 class="mb-0">Order Items - Restaurant: {{ restaurant.name|upper }} ({{ order_items|length }} items)</h5>
+                            </div>
+                            <div class="card-body">
+                                {% for order in order_items %}
+                                    {% for item in order.items %}
+                                        <div class="row mb-4">
+                                            <div class="col-lg-3 col-md-12 mb-4 mb-lg-0">
+                                                <!-- Image -->
+                                                <div class="bg-image hover-overlay hover-zoom ripple rounded" data-mdb-ripple-color="light">
+                                                    <img src="{{ item.image_url }}" class="w-100" alt="{{ item.name }}" />
+                                                    <a href="#!">
+                                                        <div class="mask" style="background-color: rgba(251, 251, 251, 0.2)"></div>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-5 col-md-6 mb-4 mb-lg-0">
+                                                <p><strong>{{ item.name }}</strong></p>
+                                                <p>{{ item.description }}</p>
+                                                {% if order.status == "PENDING" %}
+                                                    <form action="{% url 'delete_order' order.id %}" method="post">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="item_id" value="{{ item.menu_item_id }}"> 
+                                                        <button type="submit" class="btn btn-danger btn-sm me-1 mb-2" data-mdb-tooltip-init title="Remove item">
+                                                            <i class="fas fa-trash"></i> Remove order
+                                                        </button>
+                                                    </form>
+                                                {% else %}
+                                                    <button type="button" class="btn btn-danger btn-sm me-1 mb-2" data-mdb-tooltip-init title="Cannot remove order" disabled>
+                                                        <i class="fas fa-trash"></i> Disabled
+                                                    </button>
+                                                {% endif %}
+                                            </div>
+                                            <div class="col-lg-4 col-md-3 mb-4 mb-lg-0">
+                                                <p><strong>Quantity: </strong>{{ item.quantity }}</p>
+                                                <h5 class="text-warning">{{ order.status }}</h5>
+                                                <p class="text-start pt-5"><strong>Price: </strong>{{ item.price }}</p>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                {% endfor %}
+                                <div class="card-footer">
+                                    <h4>Subtotal: 
+                                        {% for subtotal_restaurant, subtotal_amount in subtotal_per_group.items %}
+                                            {% if subtotal_restaurant.pk == restaurant.pk %}
+                                                {{ subtotal_amount }}
+                                            {% endif %}
+                                        {% endfor %}
+                                    </h4>
+                                </div>
+                                <form method="POST" action="{% url 'customer_payment' %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="order_id" value="{{ order_items.0.id }}">
+                                    <input type="hidden" name="restaurant_id" value="{{ restaurant.pk }}">
+                                    <button type="submit" class="btn btn-primary btn-lg btn-block">Place Order</button>
+                                </form>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            {% else %}
+                <div class="row mt-2 justify-content-center">
+                    <div class="col text-center">
+                        <h5 class="alert alert-danger text-center mb-5">Order Items is Empty</h5>
+                    </div>
+                </div>
+            {% endif %}  {# Closing the if restaurant_order_items #}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends 'admin_base.html' %}
+{% block title %}
+Admin Dashboard
+{% endblock %}
+
+{% block content %}
+<!-- Dashboard Content -->
+<div class="container-dashboard">
+    <h4 class="heading">Admin Dashboard</h4><br>
+    <div class="row">
+        <div class="col s12 m6 l3">
+            <div class="card blue-grey darken-3 custom-card">
+                <a href="{% url 'view_customers' %}">
+                <div class="card-content white-text">
+                    <span class="card-title">Customers</span>
+                    <h3>{{ customers_count }}</h3>
+                </div>
+                <div class="card-action custom-link">
+                    <a href="{% url 'view_customers' %}">View Customers</a>
+                </div>
+            </a>
+            </div>
+        </div>
+        <div class="col s12 m6 l3">
+            <div class="card red darken-3 custom-card" >
+                <a href="{% url 'view_restaurants' %}">
+                <div class="card-content white-text">
+                    <span class="card-title">Restaurants</span>
+                    <h3>{{ restaurants_count }}</h3>
+                </div>
+                <div class="card-action custom-link">
+                    <a href="{% url 'view_restaurants' %}">View Restaurants</a>
+                </div>
+            </a>
+            </div>
+        </div>
+        <div class="col s12 m6 l3">
+            <div class="card blue darken-1 custom-card">
+                <a href="{% url 'view_riders' %}">
+                <div class="card-content white-text">
+                    <span class="card-title">Riders</span>
+                    <h3>{{ riders_count }}</h3>
+                </div>
+                <div class="card-action custom-link">
+                    <a href="{% url 'view_riders' %}">View Riders</a>
+                </div>
+            </a>
+            </div>
+        </div>
+       
+       
+    </div>
+</div>
+{% endblock %}
+
+

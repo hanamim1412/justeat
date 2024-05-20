@@ -1,0 +1,27 @@
+{% extends 'base-resto.html' %}
+
+{% block title %}
+Update Category
+{% endblock %}
+
+{% block content %}
+<!-- Update Category Content -->
+
+            <div class="container-form">
+                <form action="{% url 'update_category' category.id %}" method="POST" class="student-form">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="name">Category Name</label>
+                        <input type="text" id="name" name="name" value="{{ category.name }}">
+                    </div>
+                    <button type="submit">Update Category</button>
+                    <button onclick="goBack()">Back</button>
+                </form>
+            </div>
+<script>
+    function goBack() {
+        window.history.back();
+    }
+</script>
+
+{% endblock %}

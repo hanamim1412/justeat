@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Purchased Orders{% endblock %}
+
+{% block content %}
+<div class="container py-5 mb-5">
+    <h2 class="text-center pt-5">Purchased Orders</h2>
+
+    <!-- Messages -->
+    {% if messages %}
+        {% for message in messages %}
+        <div id="msg" class="alert {{ message.tags }} text-center" role="alert" style="width: 50%; margin: auto;">
+            {{ message }}
+        </div>
+        <script>
+            setTimeout(function() {
+                var msgElement = document.getElementById('msg');
+                if (msgElement !== null) {
+                    msgElement.parentNode.removeChild(msgElement);
+                }
+            }, 3000);
+        </script>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Search Form -->
+    <div class="row mt-5 align-content-center">
+        <div class="col-md-6 offset-md-3">
+          <form id="searchForm">
+            <div class="input-group mb-3">
+              <input type="text" class="form-control" id="searchInput" placeholder="Search by Restaurant name, Order status, Payment status, Order date, or Payment date" aria-label="Search purchased orders" aria-describedby="button-search">
+              <button class="btn btn-primary" type="submit" id="button-search">Search</button>
+            </div>
+          </form>
+        </div>
+    </div>
+
+    <!-- Table for Purchased Orders -->
+    {% if purchased_orders %}
+        <div class="table-responsive">
+            <table class="table table-bordered border-warning table-hover">
+                <thead>
+                    <tr>
+                        <th>Restaurant Name</th>
+                        <th>Order Items</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Subtotal</th>
+                        <th>Delivery Fee</th>
+                        <th>Total Amount</th>
+                        <th>Order Status</th>
+                        <th>Payment Status</th>
+                        <th>Mode of Payment</th>
+                        <th>Address</th>
+                        <th>Rider</th>
+                        <th>Order Date</th>
+                        <th>Payment Date</th>
+                        <th>Receipt</th>
+                    </tr>
+                </thead>
+                <tbody id="ordersTable">
+                    {% for payment in purchased_orders %}
+                        {% for item in payment.order.items %}
+                            <tr class="restaurant-row">
+                                {% if forloop.first %}
+                                    <td class="restaurant-name" rowspan="{{ payment.order.items|length }}">{{ payment.restaurant.name|title }}</td>
+                                {% endif %}
+                                <td>{{ item.name }}</td>
+                                <td>&#8369;{{ item.price }}</td>
+                                <td>{{ item.quantity }}</td>
+                                <td>&#8369;{{ item.subtotal }}</td>
+                                {% if forloop.first %}
+                                    <td rowspan="{{ payment.order.items|length }}"> &#8369;50</td> <!-- Assuming fixed delivery fee -->
+                                    <td rowspan="{{ payment.order.items|length }}">&#8369;{{ payment.order.total_amount }}</td>
+                                    <td rowspan="{{ payment.order.items|length }}" class="text-primary">{{ payment.order.status }}</td>
+                                    <td rowspan="{{ payment.order.items|length }}" class="text-success">
+                                        {% if payment.payment_status %}
+                                            {{ payment.payment_status }}
+                                        {% else %}
+                                            Not Paid
+                                        {% endif %}
+                                    </td>
+                                    <td rowspan="{{ payment.order.items|length }}">
+                                        {% if payment.payment_status %}
+                                            {{ payment.mop }}
+                                        {% else %}
+                                            Not Paid
+                                        {% endif %}
+                                    </td>
+                                    <td rowspan="{{ payment.order.items|length }}">{{ payment.current_address|title }}</td>
+                                    <td rowspan="{{ payment.order.items|length }}">
+                                        {% if payment.rider %}
+                                            {{ payment.rider.first_name|title }} {{ payment.rider.contact_number|title }}
+                                        {% else %}
+                                            No rider assigned yet
+                                        {% endif %}
+                                    </td>
+                                    <td rowspan="{{ payment.order.items|length }}">{{ payment.order.order_date }}</td>
+                                    <td rowspan="{{ payment.order.items|length }}">
+                                        {% if payment.payment_date %}
+                                            {{ payment.payment_date }}
+                                        {% else %}
+                                            Not Paid
+                                        {% endif %}
+                                    </td>
+                                    <td rowspan="{{ payment.order.items|length }}">
+                                        {% if payment.payment_status == "PAID" %}
+                                            <a href="{% url 'receipt' payment.id %}" class="btn btn-info btn-sm" target="_blank">Receipt</a>
+                                        {% endif %}
+                                    </td>
+                                {% endif %}
+                            </tr>
+                        {% endfor %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p>No purchased orders found.</p>
+    {% endif %}
+
+    <!-- No Results Message -->
+    <p id="noResultsMessage" style="display: none;">No results found.</p>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const searchForm = document.getElementById('searchForm');
+        const searchInput = document.getElementById('searchInput');
+        const tableRows = document.querySelectorAll('#ordersTable tr.restaurant-row');
+        const noResultsMessage = document.getElementById('noResultsMessage');
+
+        searchForm.addEventListener('submit', function (event) {
+            event.preventDefault();
+            const searchTerm = searchInput.value.toLowerCase();
+            let found = false;
+
+            tableRows.forEach(row => {
+                const restaurantNameCell = row.querySelector('.restaurant-name');
+                const restaurantName = restaurantNameCell ? restaurantNameCell.textContent.toLowerCase() : '';
+
+                const orderStatus = row.cells[7].textContent.toLowerCase();
+                const paymentStatus = row.cells[8].textContent.toLowerCase();
+                const orderDate = row.cells[11].textContent.toLowerCase();
+                const paymentDate = row.cells[12].textContent.toLowerCase();
+
+                if (restaurantName.includes(searchTerm) ||
+                    orderStatus.includes(searchTerm) ||
+                    paymentStatus.includes(searchTerm) ||
+                    orderDate.includes(searchTerm) ||
+                    paymentDate.includes(searchTerm)) {
+                    row.style.display = '';
+                    found = true;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            noResultsMessage.style.display = found ? 'none' : '';
+        });
+    });
+</script>
+{% endblock %}

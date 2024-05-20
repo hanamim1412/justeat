@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block title%} Login page{% endblock %}
+{% block content %}
+
+<div class="content">
+  <div class="container pt-5">
+    <div class="row justify-content-center">
+      <div class="col-md-6 mt-5">
+        <div class="card border-custom">
+          {% if messages %}
+            {% for message in messages %}
+              <div class="alert {{ message.tags }} text-center" id="msg" role="alert" style="width: 100%; margin: auto;">
+                {{ message }}
+              </div>
+              {% endfor %}
+          {% endif %}
+          <script>
+            setTimeout(function() {
+                var msgElement = document.getElementById('msg');
+                if (msgElement !== null) {
+                    msgElement.parentNode.removeChild(msgElement);
+                }
+            }, 2000);
+        </script>
+          <div class="card-body">
+            <h4 class="mb-4">Login</h4>
+           
+            <form method="post">
+              {% csrf_token %}
+              <div class="form-group">
+                <label for="username">Username</label>
+                {{ form.username }}
+              </div>
+              <div class="form-group">
+                <label for="password">Password</label>
+                {{ form.password }}
+              </div>
+              <div class="form-check mb-4">
+                <input type="checkbox" class="form-check-input" id="rememberMe" checked>
+                <label class="form-check-label" for="rememberMe">Remember me</label>
+                <a href="#" class="ml-auto">Forgot Password</a>
+              </div>
+              <input type="submit" value="Log In" class="btn btn-primary btn-block">
+              <p class="ml-auto">Dont Have an account?<a href="{% url 'register' %}">Register Here!</a><p>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

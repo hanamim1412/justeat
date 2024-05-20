@@ -1,0 +1,67 @@
+<!-- templates/orders/payment_details.html -->
+{% extends 'base-rider.html' %}
+{% load static %}
+
+{% block title %}Payment Details{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h2 class="teal-text text-darken-1 text-center pt-5">Payment Details</h2>
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+    </script>
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <tbody>
+                        <tr>
+                            <th scope="row">Mode of Payment:</th>
+                            <td>{{ payment.mop }}</td>
+                        </tr>
+                        {% if payment.mop != 'CASH' %}
+                            <tr>
+                                <th scope="row">Proof of Payment:</th>
+                                <td>
+                                    {% if payment.image %}
+                                        <img src="{{ payment.image.url }}" alt="Proof of Payment" class="img-fluid">
+                                    {% else %}
+                                        <p>No proof of payment provided.</p>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Reference Number:</th>
+                                <td>{{ payment.reference_number }}</td>
+                            </tr>
+                        {% endif %}
+                        <tr>
+                            <th scope="row">Delivery Address:</th>
+                            <td>{{ payment.current_address|title }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Note to Rider:</th>
+                            <td>{{ payment.note }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Payment Status:</th>
+                            <td>
+                                <span class="badge text-white
+                                {% if payment.payment_status == 'PENDING' %}bg-warning text-dark
+                                {% elif payment.payment_status == 'PAID' %}bg-success
+                                {% elif payment.payment_status == 'FAILED' %}bg-danger text-white
+                                {% endif %}">
+                                {{ payment.payment_status }}
+                            </span>
+                        </td>
+                    </tr>
+                    <button onclick="goBack()" class="btn btn-primary w-100" style="margin: auto;">Back</button>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

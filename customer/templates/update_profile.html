@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Update Profile{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <!-- Messages -->
+    {% if messages %}
+        {% for message in messages %}
+        <div id="msg" class="alert {{ message.tags }} text-center" role="alert" style="width: 50%; margin: auto;">
+            {{ message }}
+        </div>
+        <script>
+            setTimeout(function() {
+                var msgElement = document.getElementById('msg');
+                if (msgElement !== null) {
+                    msgElement.parentNode.removeChild(msgElement);
+                }
+            }, 3000);
+        </script>
+        {% endfor %}
+    {% endif %}
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header bg-primary text-white">Update Profile</div>
+        <div class="card-body">
+          <div class="text-center mb-4">
+            {% if form.instance.customer_image %}
+              <img src="{{ form.instance.customer_image.url }}" alt="{{ form.instance.username }}" class="rounded-circle" style="width: 150px; height: 150px;">
+            {% else %}
+              <img src="{% static 'images/profile.png' %}" alt="Default Profile Image" class="rounded-circle" style="width: 150px; height: 150px;">
+            {% endif %}
+          </div>
+          <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label for="email" class="form-label">Email</label>
+              {{ form.email }}
+            </div>
+            <div class="mb-3">
+              <label for="username" class="form-label">Username</label>
+              {{ form.username }}
+            </div>
+            <div class="mb-3">
+              <label for="first_name" class="form-label">First Name</label>
+              {{ form.first_name }}
+            </div>
+            <div class="mb-3">
+              <label for="last_name" class="form-label">Last Name</label>
+              {{ form.last_name }}
+            </div>
+            <div class="mb-3">
+              <label for="contact_number" class="form-label">Contact Number</label>
+              {{ form.contact_number }}
+            </div>
+            <div class="mb-3">
+              <label for="default_address" class="form-label">Default Address</label>
+              {{ form.default_address }}
+            </div>
+            <div class="mb-3">
+              <label for="customer_image" class="form-label">Profile Image</label>
+              {{ form.customer_image }}
+            </div>
+            <div class="mb-3">
+              <label for="password" class="form-label">New Password</label>
+              {{ form.password }}
+            </div>
+            <div class="mb-3">
+              <label for="confirm_password" class="form-label">Confirm New Password</label>
+              {{ form.confirm_password }}
+            </div>
+            <button type="submit" class="btn btn-primary">Update</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

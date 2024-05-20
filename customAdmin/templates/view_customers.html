@@ -1,0 +1,51 @@
+{% extends 'admin_base.html' %}
+{% include 'admin-sidebar.html' %}
+{% block title %}
+Customers
+{% endblock %}
+
+{% load static %}
+{% block content %}
+<!-- View Categories Content -->
+<div class="container-form">
+    <h2>Customers</h2>
+    <div class="container-dashboard">
+        <div class="row">
+            <div class="col s12">
+                <table class="striped centered bordered" id="courses-table">
+                        <thead>
+                            <tr>
+                                <th >No. #</th>
+                                <th>First Name</th>
+                                <th>Last Name</th>
+                                <th>Contact number</th>
+                                <th>Address</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for customer in customers %}
+                            <tr>
+                                <th class="text-center">{{ forloop.counter }}</th>
+                                <td>{{ customer.first_name|title }}</td>
+                                <td>{{ customer.last_name|title }}</td>
+                                <td>{{ customer.contact_number }}</td>
+                                <td>{{ customer.default_address }}</td>
+                                <td>
+                                    <form method="POST" action="{% url 'delete_customer' customer.user_id %}" style="display: inline;">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="customer_id" value="{{ customer.id}}">
+                                        <button type="submit" class="waves-effect waves-light btn red" onclick="return confirm('Are you sure you want to delete this customer?')">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+</div>
+  
+
+        {% endblock %}

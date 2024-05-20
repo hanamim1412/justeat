@@ -1,0 +1,180 @@
+{% extends 'base-resto.html' %}
+
+{% block title %}
+Dashboard
+{% endblock %}
+
+{% block content %}
+<!-- Dashboard Content -->
+<div class="container-dashboard">
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert {{ message.tags }} text-center" role="alert" style="width: 50%; margin: auto;">
+        {{ message }}
+    </div>
+    <script>
+        setTimeout(function() {
+            var msgElement = document.getElementById('msg');
+            if (msgElement !== null) {
+                msgElement.parentNode.removeChild(msgElement);
+            }
+        }, 2000);
+    </script>
+    {% endfor %}
+    {% endif %}
+    <h4 class="heading">Dashboard</h4><br>
+    <div class="row">
+        <!-- Categories -->
+        <div class="col s12 m6 l3">
+            <div class="card blue-grey darken-3 custom-card">
+                <a href="{% url 'view_categories' %}">
+                <div class="card-content white-text">
+                    <span class="card-title">No. of Categories</span>
+                    <h3>{{ category_count }}</h3>
+                </div>
+                <div class="card-action custom-link">
+                    <a href="{% url 'add_category' %}">Add Category</a>
+                </div>
+            </a>
+            </div>
+        </div>
+        <!-- Menu Items -->
+        <div class="col s12 m6 l3">
+            <div class="card red darken-3 custom-card">
+                <a href="{% url 'view_menu_items' %}">
+                <div class="card-content white-text">
+                    <span class="card-title">No. of Menu Items</span>
+                    <h3>{{ menu_item_count }}</h3>
+                </div>
+                <div class="card-action custom-link">
+                    <a href="{% url 'add_menu_item' %}">Add Item</a>
+                </div>
+            </a>
+            </div>
+        </div>
+        <!-- Orders -->
+        <div class="col s12 m6 l3">
+            <div class="card green darken-1 custom-card">
+                <a href="{% url 'view_orders' %}">
+                <div class="card-content white-text">
+                    <span class="card-title">No. of Orders</span>
+                    <h3>{{ order_count }}</h3>
+                </div>
+                <div class="card-action custom-link">
+                    <a href="{% url 'view_orders' %}">View Orders</a>
+                </div>
+            </a>
+            </div>
+        </div>
+
+        <div class="col s12 m6 l3">
+            <div class="card blue darken-1 custom-card">
+                <a href="#">
+                <div class="card-content white-text">
+                    <span class="card-title">Total Revenue</span>
+                    <h3>&#8369;{{ total_revenue|floatformat }}</h3>
+                </div>
+            </a>
+            </div>
+        </div>
+        
+        <div class="col s12 m12 l6">
+            <div class="card orange darken-1 custom-card">
+                <div class="card-content white-text">
+                    <span class="card-title">Total Customers</span>
+                    <h3>{{ total_customers }}</h3>
+                </div>
+            </div>
+        </div>
+        
+            <div class="col s12 m12 l6">
+                <div class="card custom-card">
+                    <div class="card-content">
+                        <span class="card-title">Orders by Status</span>
+                        <div style="height: 300px;">
+                            <canvas id="orders-by-status-chart" width="400" height="300"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        <div class="col s12 m12 l6">
+            <div class="card custom-card">
+                <div class="card-content">
+                    <span class="card-title">Payments by Mode of Payment</span>
+                    <div style="height: 300px;">
+                        <canvas id="payments-by-mode-chart" width="400" height="300"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+       
+    </div>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+
+        var orderStatuses = {{ order_statuses|safe }};
+        var orderCounts = {{ order_counts|safe }};
+        
+        var ctxOrdersByStatus = document.getElementById('orders-by-status-chart').getContext('2d');
+        var ordersByStatusChart = new Chart(ctxOrdersByStatus, {
+            type: 'pie',
+            data: {
+                labels: orderStatuses,
+                datasets: [{
+                    label: 'Orders by Status',
+                    data: orderCounts,
+                    backgroundColor: [
+                        '#2196F3',
+                        '#4CAF50',
+                        '#FFC107',
+                        '#F44336',
+                        '#9C27B0',
+                        '#673AB7'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+
+        var paymentModes = {{ payment_modes|safe }};
+        var paymentTotals = {{ payment_totals|safe }};
+        
+        var ctxPaymentsByMode = document.getElementById('payments-by-mode-chart').getContext('2d');
+        var paymentsByModeChart = new Chart(ctxPaymentsByMode, {
+            type: 'bar',
+            data: {
+                labels: paymentModes,
+                datasets: [{
+                    label: 'Payments by Mode of Payment',
+                    data: paymentTotals,
+                    backgroundColor: [
+                        '#FF6384',
+                        '#36A2EB',
+                        '#FFCE56',
+                        '#4BC0C0',
+                        '#9966FF'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: 'y',
+                scales: {
+                    x: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

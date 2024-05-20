@@ -1,0 +1,27 @@
+{% extends 'base-resto.html' %}
+
+{% block title %}
+Add Category
+{% endblock %}
+
+{% block content %}
+<!-- Add Category Content -->
+<div class="container-form">
+    <form method="POST" class="student-form">
+        {% csrf_token %}
+        <h3>Add Category</h3>
+            <label for="name">Category Name</label>
+            <input type="text" id="name" name="name" placeholder="Category name" required>
+        
+            <button type="submit">Add Category</button>
+            <button onclick="goBack()">Back</button>
+    </form>
+</div>
+      
+<script>
+    function goBack() {
+        window.history.back();
+    }
+</script>
+
+{% endblock %}

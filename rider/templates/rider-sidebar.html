@@ -1,0 +1,13 @@
+  {% comment %} sidebar section {% endcomment %}
+  
+    <div class="sidebar-container">
+      <ul id="slide-out" class="sidenav sidenav-fixed custom-sidenav" style="padding-top: 5rem;">
+          <a href="#" data-target="slide-out" class="sidenav-trigger"><i class="material-icons"></i></a>
+          <h3>Menu</h3>
+          <li class="active"><a href="{% url 'rider' %}">Dashboard</a></li>
+          <li><a href="{% url 'rider_view_orders' %}">Orders</a></li>
+          <li><a href="{% url 'view_booked_orders' %}">Booked Orders</a></li>
+          <li><a href="{% url 'delivered_orders' %}">Delivered Orders</a></li>
+      </ul>
+    </div>
+        {% comment %} contents start from other pages: dashboar, order lists, menu items, reports, payment {% endcomment %}

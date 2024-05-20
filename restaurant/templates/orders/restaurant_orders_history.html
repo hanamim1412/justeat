@@ -1,0 +1,82 @@
+<!-- templates/orders/restaurant_orders_history.html -->
+{% extends 'base-resto.html' %}
+{% load static %}
+
+{% block title %}
+Restaurant Orders History
+{% endblock %}
+
+{% block content %}
+<!-- Restaurant Orders History Content -->
+<div class="container-form">
+    <div class="container-dashboard">
+        <h2>Orders History</h2>
+        <div class="row">
+            <div class="col s12">
+                <table class="striped centered bordered" id="history-table">
+                    <thead>
+                        <tr>
+                            <th>No. #</th>
+                            <th>Customer Name</th>
+                            <th>Order Items</a></th>
+                            <th>Details</a></th>
+                            <th>Total Amount</th>
+                            <th>Order Status</th>
+                            <th>Payment Details</a></th>
+                            <th>Payment Status</th>
+                            <th>Payment Date</th>
+                            <th>Rider</th>
+                            <th>Receipt</th> 
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if payments %}
+                            {% for payment in payments %}
+                                {% with order=payment.order %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ order.customer.first_name|upper }}</td>
+                                    <td>
+                                        <ul>
+                                            {% for item in order.items %}
+                                                <li>{{ item.name }} ({{ item.quantity }} x {{ item.price|floatformat:2 }})</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'order_details' order.id %}" class="waves-effect waves-light btn">Order Details</a>
+                                    </td>
+                                    <td>&#8369;{{ order.total_amount|floatformat:2 }}</td>
+                                    <td>{{ order.status }}</td>
+                                    <td>
+                                        <a href="{% url 'payment_details' payment.id %}" class="waves-effect waves-light btn">Payment Details</a>
+                                    </td>
+                                    <td>{{ payment.payment_status }}</td>
+                                    <td>{{ payment.payment_date }}</td>
+                                    <td>
+                                        {% if payment.rider %}
+                                            {{ payment.rider.first_name|title }} {{ payment.rider.contact_number|title }}
+                                        {% else %}
+                                            No rider assigned yet
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if payment.payment_status == "PAID" %}
+                                            <a href="{% url 'restaurant_view_receipt' payment.id %}" class="btn btn-info btn-sm" target="_blank">Receipt</a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endwith %}
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="10" class="text-center">No Orders Available.</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

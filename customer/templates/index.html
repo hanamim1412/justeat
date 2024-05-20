@@ -1,0 +1,234 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %} Home Page {% endblock %}
+{% block content %}
+{% comment %} hero section  {% endcomment %}
+
+  <div id="hero" class="container-fluid body-container pt-5">
+    <img alt="header" src="{% static 'images/header.png'%}" style="width:100%">
+    <section class="home">
+        <div class="container" data-aos="fade-up" style="position: absolute; top: 25%; left: 50%; transform: translate(-50%, -50%);">
+          <!-- Header -->
+          <div class="row justify-content-center" data-aos="fade-up" data-aos-delay="150">
+            <div class="col-xl-6 col-lg-8 text-center">
+              <h1 class="display-2">Food At Your Door</h1>
+              <h2  class="lead"> From your favorite nearby Restaurants</h2>
+            </div>
+          </div>
+        </div>
+      </section>
+  </div>
+  <div class="container-fluid">
+    <!-- About 1 - Bootstrap Brain Component -->
+      <section class="py-3 py-md-5 py-xl-8">
+        <div class="container">
+          <div class="row gy-3 gy-md-4 gy-lg-0 align-items-lg-center">
+            <div class="col-12 col-lg-6 col-xl-5">
+              <img class="img-fluid rounded" loading="lazy" src="{% static 'images/header.png' %}" alt="">
+            </div>
+            <div class="col-12 col-lg-6 col-xl-7">
+              <div class="row justify-content-xl-center">
+                <div class="col-12 col-xl-11">
+                  <h2 class="h1 mb-3">ABOUT US</h2>
+                  <p class="lead fs-4 text-secondary mb-3">Experience the convenience of delicious meals delivered right to your doorstep with JustEat – because great food should always be just a click away.</p>
+                  <p class="mb-5">Savor Every Moment.</p>
+                  <div class="row gy-4 gy-md-0 gx-xxl-5X">
+                    <div class="col-12 col-md-6">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      <main>
+  <!-- Restaurant List Section -->
+  <section id="restaurants">
+      <!-- Search Section -->
+    <div class="row mt-5">
+      <div class="col-md-6 offset-md-3">
+        <form id="searchForm">
+          <div class="input-group mb-3">
+            <input type="text" class="form-control" id="searchInput" placeholder="Search nearby restaurants" aria-label="Search nearby restaurants" aria-describedby="button-search">
+            <button class="btn btn-primary" type="button" id="button-search">Search</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        const searchForm = document.getElementById('searchForm');
+        const searchInput = document.getElementById('searchInput');
+        const restaurantCards = document.querySelectorAll('.restaurant-cards .card');
+        const noResultsMessage = document.getElementById('noResultsMessage');
+        const noSearchMessage = document.getElementById('noSearchMessage');
+    
+        document.getElementById('button-search').addEventListener('click', function (event) {
+            event.preventDefault(); // Prevent form submission
+            const searchTerm = searchInput.value.trim().toLowerCase();
+    
+            // Filter restaurants based on search term
+            const filteredRestaurants = Array.from(restaurantCards).filter(function (restaurant) {
+                const name = restaurant.querySelector('.card-title').textContent.trim().toLowerCase();
+                return name.includes(searchTerm);
+            });
+    
+            // Show/hide restaurants based on filter
+            restaurantCards.forEach(function (restaurant) {
+                restaurant.style.display = 'none'; // Hide all restaurants by default
+            });
+    
+            if (searchTerm !== '' && filteredRestaurants.length === 0) {
+                // Show message for no matching restaurants
+                noSearchMessage.textContent = `No "${searchTerm}" restaurant on the list.`;
+                noSearchMessage.style.display = 'block';
+                noResultsMessage.style.display = 'none'; // Hide no results message
+            } else if (filteredRestaurants.length > 0) {
+                filteredRestaurants.forEach(function (restaurant) {
+                    restaurant.style.display = 'block'; // Show filtered restaurants
+                });
+                noResultsMessage.style.display = 'none'; // Hide no results message
+                noSearchMessage.style.display = 'none'; // Hide no search message
+            } else {
+                noResultsMessage.style.display = 'block'; // Show no results message
+                noSearchMessage.style.display = 'none'; // Hide no search message
+            }
+        });
+    });
+    
+  </script>
+        <!-- Category Section -->
+        {% comment %} <div class="row mt-5">
+          <div class="col text-center">
+              <h2 class="pb-4">Categories</h2>
+              <ul class="list-inline">
+                  {% for category in categories %}
+                  <li class="list-inline-item">
+                      <p>{{ category.name|upper }}</p>
+                  </li>
+                  {% endfor %}
+              </ul>
+          </div>
+        </div> {% endcomment %}
+
+          <div class="row mt-5 justify-content-center">
+            <div class="col text-center">
+                <h2 class="display-7" style="margin-bottom: 2rem">Nearby Restaurants</h2>
+                <div class="restaurant-cards d-flex justify-content-center align-items-start flex-wrap">
+                    {% for restaurant in restaurants %}
+                    <div class="card me-3 mb-3 scale-up">
+                        <a href="{% url 'restaurant_menu_items' restaurant.user_id %}" style="text-decoration: none; color: black;">
+                          {% if restaurant.resto_image %}
+                          <img src="{{ restaurant.resto_image.url }}" class="card-img-top card-image" alt="Restaurant">
+                      {% else %}
+                          <!-- Use default image if restaurant image does not exist -->
+                          <img src="{% static 'img/default_restaurant_image.jpg' %}" class="card-img-top card-image" alt="Default Restaurant Image">
+                      {% endif %}
+                      <div class="card-body">
+                                <h5 class="card-title">{{ restaurant.name|title }}</h5>
+                                <p class="card-title">{{ restaurant.address|title }}</p>
+                                <p class="card-title">{{ restaurant.business_hours|upper }}</p>
+                            </div>
+                        </a>
+                    </div>
+                    {% empty %}
+                    <p class="mt-3 text-black">No restaurants available.</p>
+                    {% endfor %}
+                </div>
+                <p id="noResultsMessage" class="mt-3" style="display: none;">No restaurants found.</p>
+                <p id="noSearchMessage" class="mt-3" style="display: none;"></p>
+            </div>
+          </div>
+    
+  </section>
+
+
+      <!-- Contact Us Section -->
+      <section id="contact-us">
+        <div class="row mt-5">
+          <div class="col-md-6 custom-border">
+            <h2>Contact Us</h2>
+            <form>
+              <div class="mb-3">
+                <label for="email" class="form-label">Email address</label>
+                <input type="email" class="form-control" id="email" aria-describedby="emailHelp">
+              </div>
+              <div class="mb-3">
+                <label for="message" class="form-label">Message</label>
+                <textarea class="form-control" id="message" rows="3"></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+          </div>
+          <div class="col-md-6" style="padding: 1rem 5rem;">
+            <h2>Business Hours</h2>
+            <p>Monday-Friday: 9:00 AM - 9:00 PM</p>
+            <p>Saturday-Sunday: 10:00 AM - 8:00 PM</p>
+          </div>
+        </div>
+      </section>
+    </div>
+    </div>
+  <section class="container-fluid py-4 py-md-5 py-xl-8 pb-4 bg-light border-top">
+    <div class="container overflow-hidden pb-4">
+      <div class="row gy-4 gy-lg-0 pb-4">
+        <div class="col-12 col-md-6 col-lg-4">
+          <div class="widget">
+            <h4 class="widget-title mb-4">Get in Touch</h4>
+            <address class="mb-4">Iligan City, Philippines</address>
+            <p class="mb-1">
+              <a class="link-secondary text-decoration-none" href="tel:+15057922430">(+63) 955-960-8408</a>
+            </p>
+            <p class="mb-0">
+              <a class="link-secondary text-decoration-none" href="mailto:demo@yourdomain.com">JustEat@gmail.com</a>
+            </p>
+          </div>
+        </div>
+        <div class="col-12 col-sm-6 col-md-3 col-lg-2">
+          <div class="widget">
+            <h4 class="widget-title mb-4">Just<span style="color:#C70039">Eat</span></a></h4>
+            <ul class="list-unstyled">
+              <li class="mb-2">
+                <a href="#!" class="link-secondary text-decoration-none">About</a>
+              </li>
+              <li class="mb-2">
+                <a href="#!" class="link-secondary text-decoration-none">Contact</a>
+              </li>
+              <li class="mb-2">
+                <a href="#!" class="link-secondary text-decoration-none">Terms of Service</a>
+              </li>
+              <li class="mb-0">
+                <a href="#!" class="link-secondary text-decoration-none">Privacy Policy</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="col-12 col-lg-4">
+          <div class="widget">
+            <h4 class="widget-title mb-4">Our Newsletter</h4>
+            <p class="mb-4">Subscribe to our newsletter to get our news & discounts delivered to you.</p>
+            <form action="#!">
+              <div class="row gy-4">
+                <div class="col-12">
+                  <div class="input-group">
+                    <span class="input-group-text" id="email-newsletter-addon">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-envelope" viewBox="0 0 16 16">
+                        <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4Zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1H2Zm13 2.383-4.708 2.825L15 11.105V5.383Zm-.034 6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741ZM1 11.105l4.708-2.897L1 5.383v5.722Z" />
+                      </svg>
+                    </span>
+                    <input type="email" class="form-control" id="email-newsletter" value="" placeholder="Email Address" aria-label="email-newsletter" aria-describedby="email-newsletter-addon" required>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <div class="d-grid">
+                    <button class="btn btn-primary" type="submit">Subscribe</button>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+{% endblock content %}

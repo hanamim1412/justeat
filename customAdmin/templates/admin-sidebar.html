@@ -1,0 +1,13 @@
+  {% comment %} sidebar section {% endcomment %}
+  
+    <div class="sidebar-container">
+      <ul id="slide-out" class="sidenav sidenav-fixed custom-sidenav" style="padding-top: 5rem;">
+          <a href="#" data-target="slide-out" class="sidenav-trigger"><i class="material-icons"></i></a>
+          <h3>Admin Panel</h3>
+          <li class="active"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+          <li><a href="{% url 'view_users' %}">Registered Users</a></li>
+          <li><a href="{% url 'view_customers' %}">Customers</a></li>
+          <li><a href="{% url 'view_restaurants' %}">Restaurants</a></li>
+          <li><a href="{% url 'view_riders' %}">Riders</a></li>
+      </ul>
+    </div>

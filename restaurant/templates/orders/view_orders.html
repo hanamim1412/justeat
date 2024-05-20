@@ -1,0 +1,143 @@
+<!-- templates/orders/view_orders.html -->
+{% extends 'base-resto.html' %}
+{% load static %}
+
+{% block title %}
+View Orders
+{% endblock %}
+
+{% block content %}
+<!-- View Categories Content -->
+<div class="container-form">
+    <div class="container-dashboard">
+        {% if messages %}
+            {% for message in messages %}
+            <div id="msg" class="alert {{ message.tags }} text-center" role="alert" style="width: 50%; margin: auto;">
+                {{ message }}
+            </div>
+            <script>
+                setTimeout(function() {
+                    var msgElement = document.getElementById('msg');
+                    if (msgElement !== null) {
+                        msgElement.parentNode.removeChild(msgElement);
+                    }
+                }, 2000);
+            </script>
+            {% endfor %}
+        {% endif %}
+        <h2>Orders</h2>
+        <div class="row">
+            <div class="col s12">
+                <table class="striped centered bordered" id="courses-table">
+                    <thead>
+                        <tr>
+                            <th>No. #</th>
+                            <th>Customer Name</th>
+                            <th>Order Items</a></th>
+                            <th>Details</a></th>
+                            <th>Total Amount</th>
+                            <th>Order Status (Editable)</th>
+                            <th>Payment Details</a></th>
+                            <th>Payment Status (Editable)</th>
+                            <th>Payment Date</th>
+                            <th>Rider</th>
+                            <th>Receipt</th> 
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if payments %}
+                            {% for payment in payments %}
+                                {% with order=payment.order %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ order.customer.first_name|upper }}</td>
+                                    <td>
+                                        <ul>
+                                            {% for item in order.items %}
+                                                <li>{{ item.name }} ({{ item.quantity }} x {{ item.price|floatformat:2 }})</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'order_details' order.id %}" class="waves-effect waves-light btn">Order Details</a>
+                                    </td>
+                                    <td>&#8369;{{ order.total_amount|floatformat:2 }}</td>
+                                    <td>
+                                        <form id="updateOrderForm_{{ order.id }}" method="POST" action="{% url 'update_status' %}">
+                                            {% csrf_token %}
+                                            <div class="mb-3">
+                                                <label for="status_{{ order.id }}" class="form-label">Status:</label>
+                                                <select name="status" id="status_{{ order.id }}" class="form-select form-select-lg mb-3" aria-label=".form-select-lg example" onchange="submitOrderForm('{{ order.id }}')">
+                                                    <option value="PENDING" {% if order.status == "PENDING" %} selected {% endif %}>Pending</option>
+                                                    <option value="ACCEPTED" {% if order.status == "ACCEPTED" %} selected {% endif %}>Accepted</option>
+                                                    <option value="PREPARING" {% if order.status == "PREPARING" %} selected {% endif %}>Preparing</option>
+                                                    <option value="CANCELLED" {% if order.status == "CANCELLED" %} selected {% endif %}>Cancelled</option>
+                                                </select>
+                                            </div>
+                                            <input type="hidden" name="order_id" value="{{ order.id }}">
+                                            <button type="submit" class="waves-effect waves-light btn green">Update status</button>
+                                        </form>
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'payment_details' payment.id %}" class="waves-effect waves-light btn">Payment Details</a>
+                                    </td>
+                                    <td>
+                                        <form id="updatePaymentForm_{{ payment.id }}" method="POST" action="{% url 'update_payment_status' %}">
+                                            {% csrf_token %}
+                                            <div class="mb-3">
+                                                <label for="payment_status_{{ payment.id }}" class="form-label">Payment Status:</label>
+                                                <select name="payment_status" id="payment_status_{{ payment.id }}" class="form-select form-select-lg mb-3" aria-label=".form-select-lg example" onchange="submitPaymentForm('{{ payment.id }}')">
+                                                    <option value="PENDING" {% if payment.payment_status == "PENDING" %} selected {% endif %}>Pending</option>
+                                                    <option value="PAID" {% if payment.payment_status == "PAID" %} selected {% endif %}>Paid</option>
+                                                    <option value="FAILED" {% if payment.payment_status == "FAILED" %} selected {% endif %}>Failed</option>
+                                                </select>
+                                            </div>
+                                            <input type="hidden" name="payment_id" value="{{ payment.id }}">
+                                            <button type="submit" class="waves-effect waves-light btn green">Update status</button>
+                                        </form>
+                                    </td>
+                                    <td>{{ payment.payment_date }}</td>
+                                    <td>
+                                        {% if payment.rider %}
+                                            {{ payment.rider.first_name|title }} {{ payment.rider.contact_number|title }}
+                                        {% else %}
+                                            No rider assigned yet
+                                        {% endif %}
+                                    </td>
+                                    
+                                    <td>
+                                        {% if payment.payment_status == "PAID" %}
+                                            <a href="{% url 'restaurant_view_receipt' payment.id %}" class="btn btn-info btn-sm" target="_blank">Receipt</a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endwith %}
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="10" class="text-center">No Orders Available.</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+<script>
+    function goBack() {
+        window.history.back();
+    }
+
+    function submitOrderForm(orderId) {
+        var formId = 'updateOrderForm_' + orderId;
+        document.getElementById(formId).submit();
+    }
+
+    function submitPaymentForm(paymentId) {
+        var formId = 'updatePaymentForm_' + paymentId;
+        document.getElementById(formId).submit();
+    }
+</script>

@@ -1,0 +1,178 @@
+{% extends 'base.html' %}
+{% block title%} Register page {% endblock %}
+{% block content %}
+<div class="content">
+  <div class="container pt-5">
+    <div class="row justify-content-center">
+      <div class="col-md-6 mt-5">
+        <div class="card border-custom">
+          {% if messages %}
+            {% for message in messages %}
+              <div class="alert {{ message.tags }} text-center" id="msg" role="alert" style="width: 100%; margin: auto;">
+                {{ message }}
+              </div>
+              {% endfor %}
+          {% endif %}
+          <script>
+            setTimeout(function() {
+                var msgElement = document.getElementById('msg');
+                if (msgElement !== null) {
+                    msgElement.parentNode.removeChild(msgElement);
+                }
+            }, 2000);
+        </script>
+          <div class="card-body">
+            <h1 class="mb-4">User Registration page</h1>
+            <form method="post" id="registrationForm" onsubmit="return validateForm()">
+              {% csrf_token %}
+              <div class="form-group">
+                <label for="username">Username</label>
+                {{ form.username }}
+              </div>
+              <div class="form-group">
+                <label for="email">Email</label>
+                {{ form.email }}
+              </div>
+              <div class="form-group">
+                <label for="password">Password</label>
+                {{ form.password1 }}
+              </div>
+              <div class="form-group">
+                <label for="password">Confirm Password</label>
+                {{ form.password2 }}
+              </div>
+              <label>Choose User Type</label><br>
+              <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" id="is_restaurant" name="is_restaurant">
+                <label class="form-check-label" for="is_restaurant">Restaurant</label>
+              </div>
+              <div class="restaurant-fields">
+                  <div class="form-group">
+                    <label for="restaurant_name">Restaurant Name</label>
+                    <input type="text" class="form-control" id="restaurant_name" name="restaurant_name">
+                  </div>
+                  <div class="form-group">
+                    <label for="restaurant_contact">contact number</label>
+                    <input type="text" class="form-control" id="restaurant_contact" name="restaurant_contact_number">
+                  </div>
+                  <div class="form-group">
+                    <label for="restaurant_address">Address</label>
+                    <input type="text" class="form-control" id="restaurant_address" name="restaurant_address">
+                  </div>
+                  <div class="form-group">
+                    <label for="restaurant_hrs">Business Hours</label>
+                    <input type="text" class="form-control" id="restaurant_hrs" name="restaurant_hrs">
+                  </div>
+
+              </div>
+              
+              <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" id="is_customer" name="is_customer">
+                <label class="form-check-label" for="is_customer">Customer</label>
+              </div>
+              <div class="customer-fields">
+                  <div class="form-group">
+                    <label for="customer_first_name">First Name</label>
+                    <input type="text" class="form-control" id="customer_first_name" name="customer_first_name">
+                  </div>
+                  <div class="form-group">
+                    <label for="customer_last_name">Last Name</label>
+                    <input type="text" class="form-control" id="customer_last_name" name="customer_last_name">
+                  </div>
+                  <div class="form-group">
+                    <label for="customer_contact_number">Contact number</label>
+                    <input type="text" class="form-control" id="customer_contact_number" name="customer_contact_number">
+                  </div>
+                  <div class="form-group">
+                    <label for="customer_address">Default Address</label>
+                    <input type="text" class="form-control" id="customer_address" name="customer_address">
+                  </div>
+              </div>
+              
+              <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" id="is_rider" name="is_rider">
+                <label class="form-check-label" for="is_rider">Rider</label>
+              </div>
+              <div class="rider-fields">
+                  <div class="form-group">
+                    <label for="rider_first_name">First Name</label>
+                    <input type="text" class="form-control" id="rider_first_name" name="rider_first_name">
+                  </div>
+                  <div class="form-group">
+                    <label for="rider_last_name">Last Name</label>
+                    <input type="text" class="form-control" id="rider_last_name" name="rider_last_name">
+                  </div>
+                  <div class="form-group">
+                    <label for="rider_contact_number">Contact number</label>
+                    <input type="text" class="form-control" id="rider_contact_number" name="rider_contact_number">
+                  </div>
+                  <div class="form-group">
+                    <label for="rider_dln">Driver License</label>
+                    <input type="text" class="form-control" id="rider_dln" name="rider_dln">
+                  </div>
+                  <div class="form-group">
+                    <label for="rider_age">Age</label>
+                    <input type="text" class="form-control" id="rider_age" name="rider_age">
+                  </div>
+              </div>
+              
+              <span class="text-danger">{{ form.errors }}</span>
+              <input type="submit" value="Register" class="btn btn-primary btn-block mt-3">
+              <p class="ml-auto">Already Have an account?<a href="{% url 'login_view' %}">Login Here</a><p>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 
+<script>
+  function validateForm() {
+    if (!document.getElementById('is_restaurant').checked && !document.getElementById('is_customer').checked && !document.getElementById('is_rider').checked) {
+      alert("Please select a user type.");
+      return false; 
+    }
+    return true; 
+  }
+  document.addEventListener('DOMContentLoaded', function () {
+    var checkboxes = document.querySelectorAll('.form-check-input');
+    
+    checkboxes.forEach(function(checkbox) {
+      checkbox.addEventListener('change', function () {
+        // Uncheck all checkboxes except the current one
+        checkboxes.forEach(function(cb) {
+          if (cb !== checkbox && checkbox.checked) {
+            cb.checked = false;
+            toggleFields(cb);
+          }
+        });
+        
+        // Toggle fields based on the checked checkbox
+        toggleFields(checkbox);
+      });
+    });
+    toggleFields(document.getElementById('is_customer'));
+
+    function toggleFields(checkbox) {
+      var className = checkbox.id.replace('is_', '') + '-fields';
+      var fields = document.getElementsByClassName(className);
+      
+      for (var i = 0; i < fields.length; i++) {
+        fields[i].style.display = checkbox.checked ? 'block' : 'none';
+      }
+    }
+  });
+  document.getElementById("goBackBtn").addEventListener("click", function() {
+    window.history.back();
+  });
+</script>
+
+
+<style>
+  .restaurant-fields,
+  .customer-fields,
+  .rider-fields {
+    display: none;
+  }
+</style>
+{% endblock %}

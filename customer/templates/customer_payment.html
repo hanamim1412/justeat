@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Payment{% endblock %}
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center my-1 pt-5">
+        <div class="col-md-6 d-flex flex-column">
+            <script>
+                function goBack() {
+                    window.history.back();
+                }
+            </script>
+            <button onclick="goBack()" class="btn btn-primary mb-3" style="width:200px;">Back</button>
+
+            <h2 class="text-center">Payment Details</h2>
+            <div class="card mb-4">
+                {% if order_items %}
+                    <div class="card-header py-3">
+                        <h5 class="mb-0">Restaurant: {{ restaurant.name|upper }}</h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- Customer and Order Details -->
+                        <form method="POST" action="{% url 'process_payment' order_id %}" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <input type="hidden" name="order_id" value="{{ order_items.0.id }}">
+
+                            <p><strong>Customer Name: </strong>{{ customer.first_name|title }} {{ customer.last_name|title }}</p>
+                            <p><strong>Contact Number: </strong>{{ customer.contact_number }}</p>
+                            <div class="mb-3">
+                                <label class="form-label">Delivery Address:</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="delivery_address" id="default_address" value="default" checked>
+                                    <label class="form-check-label" for="default_address">
+                                        Use Default Address: {{ customer.default_address }}
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="delivery_address" id="new_address" value="new">
+                                    <label class="form-check-label" for="new_address">
+                                        Use New Address:
+                                    </label>
+                                    <input type="text" class="form-control" id="new_address_input" name="new_address" placeholder="Enter new address">
+                                </div>
+                            </div>
+                            <!-- Order Items -->
+                            <hr>
+                            <h5>Order Items:</h5>
+                            <ul>
+                                {% for item in order_items %}
+                                    <li>{{ item.name|title }} - {{ item.price|title }} (x{{ item.quantity }}) - {{ item.subtotal }}</li>
+                                {% endfor %}
+                            </ul>
+                            <hr>
+                            <!-- Payment Details -->
+                            <p><strong>Subtotal: </strong>{{ subtotal }}</p>
+                            <p><strong>Delivery Fee: </strong>{{ delivery_fee }}</p>
+                            <p><strong>Total Price: </strong>{{ total_price }}</p>
+
+                            <div class="input-group">
+                                <span class="input-group-text">Note to rider</span>
+                                <textarea class="form-control" aria-label="With textarea" name="note" placeholder="Note to rider (e.g., Directions to deliver)"></textarea>
+                            </div>
+                            <label for="mode_of_payment" class="form-label">Mode of Payment</label>
+                            <select id="mode_of_payment" name="mode_of_payment" class="form-select form-select-lg mb-3 w-50" aria-label=".form-select example" required>
+                                <option value="CASH">Cash</option>
+                                <option value="GCASH">Gcash</option>
+                            </select>
+
+                            <!-- GCash Payment Fields -->
+                            <div id="gcash_fields" style="display: none;">
+                                <img src="{{ restaurant.resto_qrcode.url }}" alt="GCash QR Code" class="img-fluid rounded mx-auto d-block mb-3 w-50">
+                                <div class="form-group">
+                                    <label for="proof_payment">Proof of Payment (Image)</label>
+                                    <input type="file" id="proof_payment" name="proof_payment" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label for="reference_number">Reference Number</label>
+                                    <input type="text" id="reference_number" name="reference_number" class="form-control">
+                                </div>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <button type="submit" class="btn btn-primary btn-lg btn-block mt-3">Submit Payment</button>
+                        </form>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var selectPayment = document.getElementById('mode_of_payment');
+        var gcashFields = document.getElementById('gcash_fields');
+        var newAddressInput = document.getElementById('new_address_input');
+
+        togglePaymentFields();
+
+        selectPayment.addEventListener('change', togglePaymentFields);
+
+        document.querySelectorAll('input[name="delivery_address"]').forEach((elem) => {
+            elem.addEventListener("change", function(event) {
+                if (event.target.value === "new") {
+                    newAddressInput.removeAttribute('disabled');
+                } else {
+                    newAddressInput.setAttribute('disabled', 'disabled');
+                }
+            });
+        });
+
+        function togglePaymentFields() {
+            var selectedPayment = selectPayment.value;
+
+            if (selectedPayment === 'GCASH') {
+                gcashFields.style.display = 'block';
+            } else {
+                gcashFields.style.display = 'none';
+            }
+        }
+    });
+</script>
+
+{% endblock %}

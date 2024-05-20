@@ -1,0 +1,61 @@
+<!-- templates/orders/order_details.html -->
+{% extends 'base-rider.html' %}
+{% load static %}
+
+{% block title %}Order Details{% endblock %}
+
+{% block content %}
+<div class="container py-5 mt-3">
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+    </script>
+    
+    <h2 class="text-center pt-4">Order Details</h2>
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Order Items</h5>
+            {% for item in order.items %}
+            <div class="row mb-4">
+                <div class="col-md-2">
+                    <img src="{{ item.image_url }}" alt="{{ item.name }}" class="img-fluid rounded w-100">
+                </div>
+                <div class="col-md-10">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h6>{{ item.name|upper }}</h6>
+                        <span>&#8369;{{ item.price }}</span>
+                    </div>
+                    <ul class="list-unstyled">
+                        <li>Quantity: {{ item.quantity }}</li>
+                        <li>Subtotal: &#8369;{{ item.subtotal }}</li>
+                    </ul>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="mb-4">
+            <h5>Order Status</h5>
+            <span class="badge text-white
+                  {% if order.status == 'PENDING' %}bg-warning text-dark
+                  {% elif order.status == 'ACCEPTED' %}bg-primary
+                  {% elif order.status == 'PREPARING' %}bg-info
+                  {% elif order.status == 'OUT_FOR_DELIVERY' %}bg-info
+                  {% elif order.status == 'DELIVERED' %}bg-success
+                  {% elif order.status == 'CANCELLED' %}bg-danger text-white
+                  {% endif %} 
+                  ">
+                {{ order.get_status_display }}
+            </span>
+        </div>
+        <div class="mb-4">
+            <p>Date Ordered: &#8369;{{ order.order_date }}</p>
+        </div>
+        <div class="mb-4">
+            <button onclick="goBack()" class="btn btn-primary w-100" style="margin: auto;">Back</button>
+        </div>
+        
+    
+    </div>
+</div>
+{% endblock %}

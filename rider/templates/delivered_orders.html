@@ -1,0 +1,89 @@
+{% extends 'base-rider.html' %}
+
+{% block title %}
+Delivered Orders
+{% endblock %}
+
+{% block content %}
+<div class="container-form">
+    <div class="container-dashboard">
+        {% if messages %}
+            {% for message in messages %}
+            <div id="msg" class="alert {{ message.tags }} text-center" role="alert" style="width: 50%; margin: auto;">
+                {{ message }}
+            </div>
+            <script>
+                setTimeout(function() {
+                    var msgElement = document.getElementById('msg');
+                    if (msgElement !== null) {
+                        msgElement.parentNode.removeChild(msgElement);
+                    }
+                }, 2000);
+            </script>
+            {% endfor %}
+        {% endif %}
+        <h2>Delivered Orders</h2>
+        <div class="row">
+            <div class="col s12">
+                <table class="striped centered bordered" id="orders-table">
+                    <thead>
+                        <tr>
+                            <th>No. #</th>
+                            <th>Customer Name</th>
+                            <th>Order Items</th>
+                            <th>Order Details</th>
+                            <th>Total Amount</th>
+                            <th>Order Status</th>
+                            <th>Payment Details</th>
+                            <th>Note to Rider</th>
+                            <th>Payment Status</th>
+                            <th>Payment Date</th>
+                            <th>Receipt</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if payments %}
+                            {% for payment in payments %}
+                                {% with order=payment.order %}
+                                    <tr>
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>{{ order.customer.first_name|upper }}</td>
+                                        <td>
+                                            <ul>
+                                                {% for item in order.items %}
+                                                    <li>{{ item.name }} ({{ item.quantity }} x {{ item.price|floatformat:2 }})</li>
+                                                {% endfor %}
+                                            </ul>
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'rider_order_details' order.id %}" class="waves-effect waves-light btn">Order Details</a>
+                                        </td>
+                                        <td>&#8369;{{ order.total_amount|floatformat:2 }}</td>
+                                        <td>{{ order.status }}</td>
+                                        <td>
+                                            <a href="{% url 'rider_payment_details' payment.id %}" class="waves-effect waves-light btn">Payment Details</a>
+                                        </td>
+                                        <td>
+                                            {{ payment.note }}
+                                        </td>
+                                        <td>{{ payment.payment_status }}</td>
+                                        <td>{{ payment.payment_date }}</td>
+                                        <td>
+                                            <a href="{% url 'rider_view_receipt' payment.id %}" class="btn btn-info btn-sm" target="_blank">Receipt</a>
+                                        </td>
+                                    </tr>
+                                {% endwith %}
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="10" class="text-center">No Delivered Orders Available.</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

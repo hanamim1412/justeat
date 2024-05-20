@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Receipt</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        /* Custom styles */
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            background-color: white; /* Set background color */
+            color: black; /* Set text color */
+            padding: 20px; /* Add padding to ensure content is not at page edges */
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            background-color: white; /* Set container background color */
+        }
+        .receipt-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .receipt-header img {
+            max-width: 150px;
+        }
+        .receipt-details {
+            margin-bottom: 20px;
+        }
+        .receipt-items {
+            margin-bottom: 20px;
+        }
+        .receipt-customer {
+            margin-top: 20px;
+        }
+        @media print {
+            body {
+                background-color: white; /* Set background color for print */
+                color: black; /* Set text color for print */
+                padding: 0; /* Remove padding for print */
+            }
+            .container {
+                border: none; /* Remove border when printing */
+            }
+            .receipt-header img {
+                max-width: 100%;
+            }
+            .receipt-items table {
+                width: 100%;
+                margin-bottom: 15px;
+            }
+            .receipt-items th, .receipt-items td {
+                border: 1px solid #ddd;
+                padding: 8px;
+            }
+            .receipt-customer {
+                margin-top: 0; /* Adjust margin for print */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="receipt-header">
+            <img src="{{ payment.restaurant.resto_image.url }}" alt="{{ payment.restaurant.name }}">
+            <h2>{{ payment.restaurant.name|upper }}</h2>
+        </div>
+        <div class="receipt-items">
+            <h3>Ordered Items</h3>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Item Name</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in payment.order.items %}
+                    <tr>
+                        <td>{{ item.name|title }}</td>
+                        <td>&#8369;{{ item.price }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td>&#8369;{{ item.subtotal }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="receipt-details">
+            <p><strong>Ordered Date:</strong> {{ payment.order.order_date }}</p>
+            <p><strong>Delivery Fee:</strong> &#8369;50</p> <!-- Assuming fixed delivery fee -->
+            <p><strong>Total Amount:</strong> &#8369;{{ payment.order.total_amount }}</p>
+            <p><strong>Payment Date:</strong> {{ payment.payment_date }}</p>
+        </div>
+        
+        <div class="receipt-customer">
+            <h3>Customer Details</h3>
+            <p><strong>Name:</strong> {{ payment.order.customer.first_name|title }} {{ payment.order.customer.last_name|title }}</p>
+            <p><strong>Address:</strong> {{ payment.order.customer.default_address }}</p>
+            <p><strong>Contact Number:</strong> {{ payment.order.customer.contact_number }}</p>
+        </div>
+
+        <div class="text-center mt-3">
+            <button class="btn btn-secondary ml-2 d-print-none" onclick="window.print()">Print Receipt</button>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS (optional, for Bootstrap components that require JS) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
